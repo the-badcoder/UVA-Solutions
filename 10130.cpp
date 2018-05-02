@@ -1,63 +1,44 @@
-#include <iostream>
-#include <algorithm>
-#include <cstring>
+/* SuperSale */
 
+// 0-1 Knapsack DP (Top-Down) - faster as not all states are visited
+
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
 using namespace std;
 
-int weight[1002], cost[1002], n , cap;
-int dp[1002][55];
+#define MAX_N 1010
+#define MAX_W 40
 
-int knapsack( int i, int w )
-{
-    if( i >= n )
-        return 0;
+int i, T, G, ans, N, MW, V[MAX_N], W[MAX_N], memo[MAX_N][MAX_W];
 
-    if( dp[i][w] != -1 )
-        return dp[i][w];
+int value(int id, int w) {
+  if (id == N || w == 0) return 0;
+  if (memo[id][w] != -1) return memo[id][w];
+  if (W[id] > w)         return memo[id][w] = value(id + 1, w);
+  return memo[id][w] = max(value(id + 1, w), V[id] + value(id + 1, w - W[id]));
+}
 
-    int taka1 = 0, taka2 = 0;
+int main() {
+  scanf("%d", &T);
+  while (T--) {
+    memset(memo, -1, sizeof memo);
 
-    if( w + weight[i] <= cap )
-    {
-        taka1 = cost[i] + knapsack( i + 1, w + weight[i] );
-        //cout << taka1 << endl;
+    scanf("%d", &N);
+    for (i = 0; i < N; i++)
+      scanf("%d %d", &V[i], &W[i]);
+
+    ans = 0;
+    scanf("%d", &G);
+    while (G--) {
+      scanf("%d", &MW);
+      ans += value(0, MW);
     }
 
-    taka2 = knapsack( i + 1, w );
-    //cout << taka2 << endl;
+    printf("%d\n", ans);
+  }
 
-    dp[i][w] = max( taka1, taka2 );
-
-    return dp[i][w];
+  return 0;
 }
-int main()
-{
-    int test, x, sum, total, q;
 
-    scanf("%d", &test );
 
-    while( test-- )
-    {
-        scanf("%d", &n );
-
-        for( int i = 0; i < n; i++ )
-        {
-            scanf("%d %d", &cost[i], &weight[i] );
-        }
-
-        sum = 0;
-
-        scanf("%d", &q );
-
-        for( int i = 0; i < q; i++ )
-        {
-            scanf("%d", &cap );
-
-            memset( dp, -1, sizeof dp );
-            sum += knapsack( 0, 0 );
-        }
-
-        printf("%d\n", sum );
-    }
-    return 0;
-}
